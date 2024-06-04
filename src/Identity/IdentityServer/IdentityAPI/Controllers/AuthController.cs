@@ -1,7 +1,9 @@
 ﻿using IdentityAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.DependencyResolver;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -73,9 +75,57 @@ public class AuthController : ControllerBase
             return Ok(new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
+                expiration = token.ValidTo,
+                user = new
+                {
+                    user.Id,
+                    user.UserName,
+                    user.Email,
+                    Roles = userRoles
+                }
             });
         }
         return Unauthorized();
+    }
+
+    [HttpPost("UpdateProfile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileModel model)
+    {
+        var user = await _userManager.FindByIdAsync(model.UserId);
+        if (user == null)
+        {
+            return NotFound("User not found");
+        }
+
+        user.FirstName = model.FirstName;
+        user.LastName = model.LastName;
+        user.PhoneNumber = model.PhoneNumber;
+        user.DateOfBirth = model.DateOfBirth;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+        {
+            return Ok(new { messaage = "Profile updated successfully!" });
+        }
+        return BadRequest(result.Errors);
+    }
+
+    [HttpGet("GetUserProfile")]
+    public async Task<IActionResult> GetUserProfile(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound("User not found");
+        }
+
+        return Ok(new
+        {
+            user.FirstName,
+            user.LastName,
+            user.PhoneNumber,
+            user.DateOfBirth,
+        });
     }
 }

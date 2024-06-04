@@ -1,5 +1,5 @@
 import axios from "axios";
-import App from "../App";
+import { profile } from "console";
 
 const API_URL = "https://localhost:5001/api/auth/";
 
@@ -16,4 +16,16 @@ export const login = (email: string, password: string) => {
     email,
     password,
   });
+};
+
+export const getUserProfile = (userId: string) => {
+  return axios.get(`${API_URL}GetUserProfile`, {
+    params: {
+      userId,
+    },
+  });
+};
+
+export const updateProfile = (profileData: any) => {
+  return axios.post(`${API_URL}UpdateProfile`, profileData);
 };
