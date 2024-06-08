@@ -4,7 +4,12 @@ import SignIn from "./SignIn/SignIn";
 import SignUp from "./SignUp/SignUp";
 import Account from "./Account/Account";
 import AdminDashboard from "./Dasboards/AdminDashboard";
-import UserDashboard from "./Dasboards/UserDashboard";
+import ProfessorDashboard from "./Dasboards/ProfessorDashboard";
+import StudentDashboard from "./Dasboards/UserDashboard";
+import UniversityList from "./University/UniversityList";
+import FacultyList from "./University/FacultyList";
+import BuildingList from "./University/BuildingList";
+import RoomList from "./University/RoomList";
 
 export {
     Home,
@@ -13,5 +18,10 @@ export {
     SignUp,
     Account,
     AdminDashboard,
-    UserDashboard
+    StudentDashboard,
+    ProfessorDashboard,
+    UniversityList,
+    FacultyList,
+    BuildingList,
+    RoomList
 }

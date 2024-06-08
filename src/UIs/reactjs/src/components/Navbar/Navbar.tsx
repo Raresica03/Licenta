@@ -20,8 +20,11 @@ export default function Navbar() {
             <CustomLink to="/signup">Sign Up</CustomLink>
           </>
         )}
-        {user && user.roles.includes("User") && (
-          <CustomLink to="/user-dashboard">U-Dasboard</CustomLink>
+        {user && user.roles.includes("Student") && (
+          <CustomLink to="/student-dashboard">S-Dasboard</CustomLink>
+        )}
+        {user && user.roles.includes("Professor") && (
+          <CustomLink to="/professor-dashboard">P-Dasboard</CustomLink>
         )}
         {user && user.roles.includes("Admin") && (
           <CustomLink to="/admin-dashboard">A-Dasboard</CustomLink>
@@ -29,6 +32,7 @@ export default function Navbar() {
         {user && (
           <>
             <CustomLink to="/my-account">Profile</CustomLink>
+            <CustomLink to="/universities">Universities</CustomLink>
             <li>
               <button onClick={logout}>Logout</button>
             </li>

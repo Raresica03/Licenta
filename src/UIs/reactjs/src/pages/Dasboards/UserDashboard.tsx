@@ -1,12 +1,12 @@
 import React from "react";
 
-const UserDashboard: React.FC = () => {
+const StudentDashboard: React.FC = () => {
   return (
     <div>
-      <h2>User Dashboard</h2>
-      <p>Welcome to the user dashboard!</p>
+      <h2>Student Dashboard</h2>
+      <p>Welcome to the student dashboard!</p>
     </div>
   );
 };
 
-export default UserDashboard;
+export default StudentDashboard;
