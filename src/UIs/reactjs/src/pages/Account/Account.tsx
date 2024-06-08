@@ -40,7 +40,7 @@ const Account: React.FC = () => {
     e.preventDefault();
     try {
       const response = await updateProfile({
-        userId: user.id,
+        userId: user?.id,
         firstName,
         lastName,
         phoneNumber,

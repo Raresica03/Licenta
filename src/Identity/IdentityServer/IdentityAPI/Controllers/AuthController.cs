@@ -28,7 +28,15 @@ public class AuthController : ControllerBase
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Role = model.Role };
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            FirstName = "DefaultFirstName",  // Provide default value
+            LastName = "DefaultLastName",    // Provide default value
+            DateOfBirth = DateTime.Now       // Provide default value or use null if nullable
+        };
+
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
@@ -37,10 +45,35 @@ public class AuthController : ControllerBase
             {
                 await _roleManager.CreateAsync(new IdentityRole(model.Role));
             }
-            await _userManager.AddToRoleAsync(user, model.Role);
-            return Ok(new { message = "User registered successfully!" });
+            var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
+            if (roleResult.Succeeded)
+            {
+                return Ok(new
+                {
+                    message = "User registered successfully!",
+                    user = new
+                    {
+                        user.Id,
+                        user.UserName,
+                        user.Email,
+                        roles = new[] { model.Role } // Ensure roles are included
+                    },
+                    token = GenerateJwtToken(user, model.Role)
+                });
+            }
+            else
+            {
+                var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                Console.WriteLine($"Role assignment error: {roleErrors}");
+                return BadRequest(new { message = "Role assignment failed.", errors = roleResult.Errors.Select(e => e.Description) });
+            }
         }
-        return BadRequest(result.Errors);
+        else
+        {
+            var creationErrors = string.Join(", ", result.Errors.Select(e => e.Description));
+            Console.WriteLine($"User creation error: {creationErrors}");
+            return BadRequest(new { message = "User creation failed.", errors = result.Errors.Select(e => e.Description) });
+        }
     }
 
     [HttpPost("Login")]
@@ -127,5 +160,27 @@ public class AuthController : ControllerBase
             user.PhoneNumber,
             user.DateOfBirth,
         });
+    }
+
+    private string GenerateJwtToken(ApplicationUser user, string role)
+    {
+        var authClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.Role, role)
+    };
+
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Issuer"],
+            expires: DateTime.Now.AddHours(3),
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

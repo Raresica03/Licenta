@@ -4,6 +4,7 @@ using IdentityAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IdentityAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240608113359_AddUniversityFacultyBuildingRoom")]
+    partial class AddUniversityFacultyBuildingRoom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,6 +77,10 @@ namespace IdentityAPI.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -209,19 +216,19 @@ namespace IdentityAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b2a691e2-fc5c-4437-b4f5-09b8d4bd6f86",
+                            Id = "e445f8ed-624c-471f-bee4-f2e037824706",
                             Name = "Professor",
                             NormalizedName = "PROFESSOR"
                         },
                         new
                         {
-                            Id = "67a25d37-27c4-4b00-aecd-0f95253709af",
+                            Id = "05550913-e41b-474d-93ba-a70aae1b6bf3",
                             Name = "Student",
                             NormalizedName = "STUDENT"
                         },
                         new
                         {
-                            Id = "d02fcf69-5d9c-41c5-87d9-b5ad5e163634",
+                            Id = "70b07e1e-58ac-4b10-a789-e9476843df06",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -336,7 +343,7 @@ namespace IdentityAPI.Migrations
             modelBuilder.Entity("IdentityAPI.Models.Building", b =>
                 {
                     b.HasOne("IdentityAPI.Models.Faculty", "Faculty")
-                        .WithMany("Buildings")
+                        .WithMany("Buidings")
                         .HasForeignKey("FacultyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -424,7 +431,7 @@ namespace IdentityAPI.Migrations
 
             modelBuilder.Entity("IdentityAPI.Models.Faculty", b =>
                 {
-                    b.Navigation("Buildings");
+                    b.Navigation("Buidings");
                 });
 
             modelBuilder.Entity("IdentityAPI.Models.University", b =>

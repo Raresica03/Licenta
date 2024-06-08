@@ -1,5 +1,4 @@
 import axios from "axios";
-import { profile } from "console";
 
 const API_URL = "https://localhost:5001/api/auth/";
 

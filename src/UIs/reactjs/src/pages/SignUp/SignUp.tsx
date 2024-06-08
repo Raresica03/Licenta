@@ -1,14 +1,13 @@
-import React from "react";
-import { useState } from "react";
-import { register } from "../../services/authService";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { register } from '../../services/authService';
+import { useAuth, } from '../../context/AuthContext';
 
 const SignUp: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("User");
-  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Student'); // Default role
+  const [message, setMessage] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -16,13 +15,33 @@ const SignUp: React.FC = () => {
     e.preventDefault();
     try {
       const response = await register(email, password, role);
-      login(response.data.user, response.data.token);
-      navigate("/my-account");
-      setMessage(response.data.message);
-    } catch (error) {
-      setMessage("Registration failed!");
+      const { message, user, token } = response.data;
+
+      console.log('Response:', response.data);
+      console.log('User:', user);
+      console.log('Token:', token);
+
+      setMessage(message);
+      if (user && token) {
+        console.log('Logging in with:', user, token);
+        login(user, token);
+        navigate('/my-account');
+      } else {
+        setMessage('Registration failed: Unexpected response structure.');
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.join(', ');
+        setMessage(`Registration failed: ${errorMessages}`);
+      } else if (error.response && error.response.data && error.response.data.message) {
+        setMessage(`Registration failed: ${error.response.data.message}`);
+      } else {
+        setMessage('Registration failed: Unknown error');
+      }
     }
   };
+
   return (
     <form onSubmit={handleRegister}>
       <h2>Sign Up</h2>
@@ -45,7 +64,8 @@ const SignUp: React.FC = () => {
       <div>
         <label>Role:</label>
         <select value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="User">User</option>
+          <option value="Student">Student</option>
+          <option value="Professor">Professor</option>
           <option value="Admin">Admin</option>
         </select>
       </div>
